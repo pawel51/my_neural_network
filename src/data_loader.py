@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def load_data():
-    data_train = pd.read_csv('images/train/fashion-mnist_train.csv')
+    data_train = pd.read_csv('../images/train/fashion-mnist_train.csv')
     data_test = pd.read_csv('fashion-mnist_test.csv')
     # 60.000 of images
     train_images = np.array(data_train.iloc[:, 1:]) / 255
