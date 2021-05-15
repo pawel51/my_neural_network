@@ -1,9 +1,8 @@
-from myfunctions import he
 
 
 class Edge:
     def __init__(self, start, end):
-        self.weight = 0  # random
+        self.weight = 0  # before init weights
         self.start = start  # starting node address
         self.end = end  # ending node address
 
@@ -16,13 +15,14 @@ class Edge:
     def get_weigth(self):
         return self.weight
 
-    def set_start(self, new_start):
-        self.start = new_start
-
     def set_end(self, new_end):
         self.end = new_end
+
+    def set_start(self, new_start):
+        self.start = new_start
 
     def set_weight(self, new_weight):
         self.weight = new_weight
 
-
+    def to_string(self):
+        return f"{self.start.r}__{self.weight}__{self.end.r}\n"

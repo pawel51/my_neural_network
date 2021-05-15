@@ -1,6 +1,5 @@
 from myfunctions import relu, he
-from layer import Layer
-from edge import Edge
+
 
 class Network:
     def __init__(self, alfa, activation_function, layers, initializer, data):
@@ -13,28 +12,32 @@ class Network:
         self.inputs = data
 
 
+    # def concat_layers(self):
+    #     i_layer=0
+    #     for layer in self.layers:
+    #         for node in layer.get_node_list():
+    #             if i_layer == 0:
+    #                 node.add_inputs_from_user(self.layers[0], self.inputs)
+    #             if i_layer > 0:
+    #                 node.add_inputs_from_prev_layer(self.layers[i_layer - 1])
+    #         i_layer += 1
+
 
     def concat_layers(self):
-        i_layer=0
-        for layer in self.layers:
-            for node in layer.get_node_list():
-                if i_layer == 0:
-                    node.add_inputs_from_user(self.layers[0], self.inputs)
-                if i_layer > 0:
-                    node.add_inputs_from_prev_layer(self.layers[i_layer - 1])
-            i_layer += 1
+        self.layers[0].add_inputs_from_user(self.inputs)
+        prev_layer = self.layers[0]
+        for layer in self.layers[1:]:
+            layer.concat_layers(prev_layer)
+            prev_layer = layer
 
-    def init_weights(self, initializer):
+    def init_weights(self):
         i_layer = 0
-        j_node = 0
-        k_input = 0
         for layer in self.layers:
             weights = he(layers=self.layers, index=i_layer)
-            for node in layer.get_node_list():
-                for input in node.get_inputs():
-                    input.set_weight(weights[j_node][k_input])
-                    k_input += 1
-                j_node += 1
-        i_layer += 1
+            layer.init_weights(weights)
+
+    def print_network(self):
+        for layer in self.layers:
+            print(layer.to_string())
 
 
