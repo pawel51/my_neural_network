@@ -20,18 +20,21 @@ class Layer:
 
     def concat_layers(self, prev_layer):
         for node in self.node_list:
-            node.create_inputs(prev_layer.node_list)
+            node.create_inputs(prev_layer.get_node_list())
 
     def init_weights(self, weights):
         for node, index in zip(self.node_list, range(self.node_count)):
             node.set_input_weights(weights[index])
 
     def to_string(self):
-        layer_str = f"L: {self.index}\n"
+        layer_str = ""
+        if self.index == 0:
+            layer_str = "******************\n"
+        layer_str += f"L: {self.index}\n"
 
         if self.index == 0:
             for node in self.node_list:
-                layer_str += str(node.get_output()) + "\n"
+                layer_str += "OUTPUT: "+str(node.get_output()) + "\n"
             layer_str += "******************\n"
             return layer_str
 
@@ -39,3 +42,6 @@ class Layer:
             layer_str += node.to_string()
         layer_str += "******************\n"
         return layer_str
+
+    def get_node_list(self):
+        return self.node_list

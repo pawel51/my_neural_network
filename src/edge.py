@@ -25,4 +25,4 @@ class Edge:
         self.weight = new_weight
 
     def to_string(self):
-        return f"{self.start.r}__{self.weight}__{self.end.r}\n"
+        return f"{self.start.r}__{round(self.weight,2)}__{self.end.r}\n"

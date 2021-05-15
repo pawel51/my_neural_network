@@ -31,10 +31,11 @@ class Network:
             prev_layer = layer
 
     def init_weights(self):
-        i_layer = 0
-        for layer in self.layers:
+        i_layer = 1
+        for layer in self.layers[1:]:
             weights = he(layers=self.layers, index=i_layer)
             layer.init_weights(weights)
+            i_layer += 1
 
     def print_network(self):
         for layer in self.layers:

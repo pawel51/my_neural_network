@@ -13,8 +13,7 @@ def relu(x):
 
 def he(layers, index):
     if index == 0:
-        size_l_prev = 1
-        size_l = layers[0].get_node_list()
+        return
     else:
         size_l_prev = len(layers[index - 1].get_node_list())
         size_l = len(layers[index].get_node_list())
