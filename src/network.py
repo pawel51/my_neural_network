@@ -1,4 +1,4 @@
-from myfunctions import relu, he
+from myfunctions import relu, he, sigmoid, tanh, xavier
 
 
 class Network:
@@ -6,10 +6,27 @@ class Network:
         self.alfa = alfa
         self.layers = layers
         self.layers_len = len(layers)
+
+        self.inputs = data
+        if initializer == 'he':
+            self.initializer = he
+        if initializer == 'xavier':
+            self.initializer = xavier
+        else:
+            self.initializer = he
+
         self.initializer = initializer
         if activation_function == 'relu':
             self.act_func = relu
-        self.inputs = data
+        if activation_function == 'sigmoid':
+            self.act_func = sigmoid
+        if activation_function == 'tanh':
+            self.act_func = tanh
+        else:
+            self.act_func = relu
+
+
+
 
 
     def concat_layers(self):
