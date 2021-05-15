@@ -26,6 +26,18 @@ class Layer:
         for node, index in zip(self.node_list, range(self.node_count)):
             node.set_input_weights(weights[index])
 
+
+    def feed_layer(self, activ):
+        for node in self.node_list:
+            node.forward(activ)
+
+
+
+
+
+
+
+
     def to_string(self):
         layer_str = ""
         if self.index == 0:

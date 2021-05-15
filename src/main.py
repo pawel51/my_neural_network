@@ -27,13 +27,14 @@ if __name__ == '__main__':
     layers.append(Layer(0, 2))
 
 
-    for i in range(1, 2):
+    for i in range(1, 3):
         layers.append(Layer(i, 2))
 
 
     network = Network(0.3, 'relu', layers, 'he', ['0','1'])
     network.concat_layers()
     network.init_weights()
+    network.feed_sample()
     end = time()
 
     print(f"{round(end-start, 2)} s")

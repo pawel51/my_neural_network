@@ -6,13 +6,14 @@ class Edge:
         self.start = start  # starting node address
         self.end = end  # ending node address
 
+
     def get_end(self):
         return self.end
 
     def get_start(self):
         return self.start
 
-    def get_weigth(self):
+    def get_weight(self):
         return self.weight
 
     def set_end(self, new_end):

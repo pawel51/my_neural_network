@@ -2,13 +2,14 @@ import numpy as np
 
 
 def relu(x):
-    if x is not isinstance(x, (int, float)):
-        print("x is not a number")
-        return 0
     if x <= 0:
         return 0
     else:
         return x
+
+def sigmoid(x):
+    pass
+
 
 
 def he(layers, index):
