@@ -31,11 +31,20 @@ if __name__ == '__main__':
         layers.append(Layer(i, 2))
 
 
-    network = Network(0.3, 'relu', layers, 'he', ['0','1'])
+    network = Network(
+        alfa=0.3,
+        activation_function='sigmoid',
+        layers=layers,
+        initializer='he',
+        loss_function='L2',
+        data=[0,1])
     network.concat_layers()
     network.init_weights()
-    network.feed_sample()
+    network.train_sample(estimator=[0,1])
+    print(network.print_network())
+    # network.train_sample(estimator=['0','1'])
+    # print(network.print_network())
     end = time()
 
-    print(f"{round(end-start, 2)} s")
-    print(network.print_network())
+    print(f"Execution time: {round(end-start, 2)} s")
+

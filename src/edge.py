@@ -5,7 +5,16 @@ class Edge:
         self.weight = 0  # before init weights
         self.start = start  # starting node address
         self.end = end  # ending node address
+        self.gradient = 0
 
+    def set_gradient(self, gradient):
+        self.gradient = gradient
+
+    def add_to_gradient(self, num):
+        self.gradient += num
+
+    def get_gradient(self):
+        return self.gradient
 
     def get_end(self):
         return self.end
@@ -26,4 +35,4 @@ class Edge:
         self.weight = new_weight
 
     def to_string(self):
-        return f"{self.start.r}__{round(self.weight,2)}__{self.end.r}\n"
+        return f"{self.start.r}__{round(self.weight,2)}__{self.end.r} GRAD: {round(self.gradient, 2)}\n"
