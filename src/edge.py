@@ -1,4 +1,4 @@
-
+import math as m
 
 class Edge:
     def __init__(self, start, end):
@@ -6,6 +6,31 @@ class Edge:
         self.start = start  # starting node address
         self.end = end  # ending node address
         self.gradient = 0
+        self.mean = 0
+        self.variance = 0
+
+
+    def update_gradient(self, n, alfa):
+        self.weight -= alfa * (self.gradient/n)
+        self.gradient = 0
+
+    def update_gradient_adam(self, n, alfa):
+        beta1 = 0.9
+        beta2 = 0.999
+        eps = 0.00000001
+
+        self.gradient /= n
+
+        self.mean = beta1 * self.mean - (1 - beta1) * self.gradient
+        mean = self.mean / (1 - beta1)
+
+        self.variance = beta2 * self.variance + (1 - beta2) * self.gradient * self.gradient
+        variance = self.variance / (1 - beta2)
+
+
+        self.weight -= alfa * (mean / (m.sqrt(variance)+eps))
+        self.gradient = 0
+
 
     def set_gradient(self, gradient):
         self.gradient = gradient
@@ -33,6 +58,9 @@ class Edge:
 
     def set_weight(self, new_weight):
         self.weight = new_weight
+
+    def add_to_weight(self, num):
+        self.weight += num
 
     def to_string(self):
         return f"{self.start.r}__{round(self.weight,2)}__{self.end.r} GRAD: {round(self.gradient, 2)}\n"

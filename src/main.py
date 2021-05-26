@@ -1,12 +1,8 @@
-from layer import Layer
 from network import Network
 import numpy as np
-import cv2
-import pandas as pd
-import matplotlib.pyplot as plt
 from time import time
+from data_loader import load_data
 
-img_rows, img_cols = 28, 28
 categories = [
     'T-shirt/top',
     'Trouser',
@@ -20,30 +16,71 @@ categories = [
     'Ankle boot'
     ]
 
+outs = [
+    [1,0,0,0,0,0,0,0,0,0],
+    [0,1,0,0,0,0,0,0,0,0],
+    [0,0,1,0,0,0,0,0,0,0],
+    [0,0,0,1,0,0,0,0,0,0],
+    [0,0,0,0,1,0,0,0,0,0],
+    [0,0,0,0,0,1,0,0,0,0],
+    [0,0,0,0,0,0,1,0,0,0],
+    [0,0,0,0,0,0,0,1,0,0],
+    [0,0,0,0,0,0,0,0,1,0],
+    [0,0,0,0,0,0,0,0,0,1],
+]
+
+def print_index_of_max(vector):
+    return
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     start = time()
     layers = []
-    layers.append(Layer(0, 2))
 
-
-    for i in range(1, 3):
-        layers.append(Layer(i, 2))
-
+    # <--- DATA --->
+    samples, labels = load_data()
 
     network = Network(
-        alfa=0.3,
+        alfa=0.4,
         activation_function='sigmoid',
-        layers=layers,
         initializer='he',
-        loss_function='L2',
-        data=[0,1])
+        loss_function='L2')
+
+    # First Layer
+    network.append_layer(784)
+
+    sample0 = samples[0]
+    labels0 = labels[0]
+    print(labels0)
+    for i in range(1, 10):
+        network.append_layer(10)
+
+    # Last Layer
+    network.append_layer(10)
+
     network.concat_layers()
     network.init_weights()
-    network.train_sample(estimator=[0,1])
-    print(network.print_network())
-    # network.train_sample(estimator=['0','1'])
-    # print(network.print_network())
+    print('AFTER INIT')
+
+
+    for i in range(100):
+        network.train_sample(sample=samples[i%10], label=outs[labels[i%10][0]])
+        if i % 2 == 0:
+            network.update_gradients(2, adam=0)
+
+    print('AFTER TRAINING')
+
+
+    y = []
+    y.append(network.test_sample(sample=sample0))
+
+
+    print('AFTER TESTING')
+
+    y = np.array(y)
+    max_index_of_y = np.argmax(y)
+    print(max_index_of_y)
+    print(f'Should be: {labels0[0]}')
     end = time()
 
     print(f"Execution time: {round(end-start, 2)} s")

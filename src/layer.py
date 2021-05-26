@@ -1,5 +1,6 @@
 from node import Node
 from myfunctions import he
+import numpy as np
 
 
 class Layer:
@@ -13,7 +14,8 @@ class Layer:
 
     def add_inputs_from_user(self, data_list):
         if self.node_count != len(data_list) and self.index == 0:
-            print("ERROR: INPUT SIZE DIFFERS FROM LAYER[0] LEANGTH")
+            print(self.node_count)
+            print("ERROR: INPUT SIZE DIFFERS FROM LAYER[0] LIST")
 
         for node, index in zip(self.node_list, range(len(data_list))):
             node.set_output(data_list[index])
@@ -26,7 +28,6 @@ class Layer:
         for node, index in zip(self.node_list, range(self.node_count)):
             node.set_input_weights(weights[index])
 
-
     def feed_layer(self, activ):
         for node in self.node_list:
             node.forward(activ)
@@ -38,12 +39,22 @@ class Layer:
     def back_prop(self, act):
         for node in self.node_list:
             node.backward(act=act)
+            node.set_error(0)
 
+    def update_gradients(self, n, alfa, adam):
+        if not adam:
+            for node in self.node_list:
+                node.update_gradients(n, alfa)
+        if adam:
+            for node in self.node_list:
+                node.update_gradients_adam(n, alfa)
 
-
-
-
-
+    # returns output vector
+    def get_outputs(self):
+        a = []
+        for node in self.node_list:
+            a.append(round(node.get_output(), 4))
+        return a
 
     def to_string(self):
         layer_str = ""
@@ -53,7 +64,7 @@ class Layer:
 
         if self.index == 0:
             for node in self.node_list:
-                layer_str += "OUTPUT: "+str(node.get_output()) + "\n"
+                layer_str += "OUTPUT: " + str(node.get_output()) + "\n"
             layer_str += "******************\n"
             return layer_str
 
