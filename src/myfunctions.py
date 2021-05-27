@@ -1,13 +1,13 @@
 import numpy as np
 import math as m
-
+import numpy as np
 
 
 
 def L2(y, yhat, derivative=0):
     if derivative == 1:
         return L2_der(y, yhat)
-    return m.pow(yhat - y, 2)
+    return np.power(yhat - y, 2)
 
 
 def L2_der(y, yhat):
@@ -17,7 +17,7 @@ def L2_der(y, yhat):
 def L1(y, yhat, derivative=0):
     if derivative == 1:
         return L1_der(y, yhat)
-    return abs(yhat - y)
+    return np.abs(yhat - y)
 
 
 def L1_der(y, yhat):
@@ -32,7 +32,9 @@ def L1_der(y, yhat):
 def BCE(y, yhat, derivative=0):
     if derivative == 1:
         return BCE_der(y, yhat)
-    return y * m.log(yhat, m.e) + (1 - y) * m.log(1 - yhat, m.e)
+
+    return y * m.log(yhat) + (1 - y) * np.log(1 - yhat)
+
 
 
 def BCE_der(y, yhat):
