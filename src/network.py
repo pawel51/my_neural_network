@@ -56,22 +56,24 @@ class Network:
         for layer in self.layers[1:]:
             layer.update_gradients(n, self.alfa, adam=adam)
 
-    def calc_loss(self, label):
-        yhat = np.array(self.layers[len(self.layers) - 1].get_outputs())
-        y = np.array(label)
-        return np.sum(self.l_f(yhat=yhat, y=y))
+    def calc_loss(self):
+        # yhat = np.array(self.layers[len(self.layers) - 1].get_outputs())
+        # y = np.array(label)
+        # accumulated loss vector
+        loss_v = np.array(self.layers[len(self.layers)-2].get_losses())
+        return loss_v
 
     # <--- Training starts here --->
     def train_sample(self, sample, label):
         self.feed_sample(sample)
         self.start_back_prop(estimator=label)
         self.back_prop()
-        return self.calc_loss(label)
+        return self.calc_loss()
 
     # <--- Testing starts here --->
     def test_sample(self, sample, label):
         self.feed_sample(sample)
-        return self.calc_loss(label)
+        return self.calc_loss()
 
     def feed_sample(self, inputs):
         self.layers[0].add_inputs_from_user(inputs)

@@ -49,6 +49,13 @@ class Layer:
             for node in self.node_list:
                 node.update_gradients_adam(n, alfa)
 
+    # returns losses vector
+    def get_losses(self):
+        a = []
+        for node in self.node_list:
+            a.append((node.get_loss()))
+        return a
+
     # returns output vector
     def get_outputs(self):
         a = []
