@@ -60,7 +60,7 @@ class Network:
         # yhat = np.array(self.layers[len(self.layers) - 1].get_outputs())
         # y = np.array(label)
         # accumulated loss vector
-        loss_v = np.array(self.layers[len(self.layers)-2].get_losses())
+        loss_v = np.array(self.layers[len(self.layers)-1].get_losses())
         return loss_v
 
     # <--- Training starts here --->

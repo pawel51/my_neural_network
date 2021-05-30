@@ -62,16 +62,16 @@ def split_arr(mb_size, array):
             array = np.delete(array, index, axis=0)
         b_arr.append(np.array(mb_arr.copy()))
         del mb_arr
-    if array:
-        np.append(array)
 
-    b_arr = np.array(b_arr) / 255
-    return b_arr[:,:,:,1:], b_arr[:,:,:,0:1]
+
+    b_arr = np.array(b_arr)
+
+    return b_arr[:,:,:,1:] / 255, b_arr[:,:,:,0:1]
 
 
 if __name__ == '__main__':
-    # get_data(20)
-    train_data, valid_data = load_data(split_rate=0.75, num=20)
-    train_samples, train_labels = split_arr(array=train_data, mb_size=5)
-    valid_data = split_arr(array=valid_data, mb_size=5)
+    get_data(60)
+    # train_data, valid_data = load_data(split_rate=0.75, num=1000)
+    # train_samples, train_labels = split_arr(array=train_data, mb_size=10)
+    # valid_data = split_arr(array=valid_data, mb_size=5)
     print('ok')

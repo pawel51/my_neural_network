@@ -16,7 +16,7 @@ class Node:
         self.error = 0
         self.mean = 0
         self.variance = 0
-        self.loss_buff = 0
+        self.loss = 0
 
     def create_inputs(self, prev_layer_node_list):
         for node in prev_layer_node_list:
@@ -54,7 +54,7 @@ class Node:
     def start_back(self, l_f, y, act):
         # dL/dyhat
         dL_dyhat = l_f(y=y, yhat=self.get_output(), derivative=1)
-        self.loss_buff += l_f(y=y, yhat=self.get_output(), derivative=0)
+        self.loss = l_f(y=y, yhat=self.get_output(), derivative=0)
         self.error = dL_dyhat
         self.loop_back_inputs(act=act)
 
@@ -87,7 +87,7 @@ class Node:
 
 
     def get_loss(self):
-        return self.loss_buff
+        return self.loss
 
     def get_error(self):
 

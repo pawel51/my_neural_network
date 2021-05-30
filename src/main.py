@@ -2,7 +2,7 @@ from network import Network
 import numpy as np
 from time import time
 from data_loader import load_data, split_arr
-from plots import loss_plot, accuracy_plot
+from plots import draw_plots
 
 categories = [
     'T-shirt/top',
@@ -30,31 +30,30 @@ outs = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 ]
 
-# Numer of iterations
-NITER = 3
+
 # Mini batch size
-MB_SIZE = 5
+MB_SIZE = 3
 # Label size
 LABEL_SIZE = 10
 # Input Size
 IN_SIZE = 784
 # Number of Hidden layers, number of neurons in each
-HID_LAY = (3, 10)
+HID_LAY = (10, 10)
 # split rate
 SPLIT_RATE = 0.75
 # sample count
-NUM = 20
+NUM = 60
+# How many times through whole training set
+EPOCHS = 2
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     start = time()
 
     # <--- DATA --->
-    # 10, 20, 100, 1000, 10k, 60k
+    # 20, 100, 1000, 10k, 60k
     train_data, valid_data = load_data(split_rate=SPLIT_RATE, num=NUM)
-    train_data = split_arr(array=train_data, mb_size=MB_SIZE)
-    valid_data = split_arr(array=valid_data, mb_size=MB_SIZE)
-    tra
+    print("DATA LOADED")
 
     network = Network(
         alfa=0.1,
@@ -73,50 +72,63 @@ if __name__ == '__main__':
 
     network.concat_layers()
     network.init_weights()
-    print('AFTER INIT')
+    print('AFTER NETWORK INIT')
 
+    # <--- Training Loop --->
     train_loss_sum = 0
     valid_loss_sum = 0
+    train_accuracy = 0
+    valid_accuracy = 0
     train_loss_arr = []
     valid_loss_arr = []
     train_accuracy_arr = []
     valid_accuracy_arr = []
-    for i in range(1, NITER * NUM + 1):
 
-        train_sample = train_samples[i % int(NUM * SPLIT_RATE)]
-        train_label = outs[train_labels[i % int(NUM * SPLIT_RATE)][0]]
-        valid_sample = valid_samples[i % int(NUM * (1 - SPLIT_RATE))]
-        valid_label = outs[valid_labels[i % int(NUM * (1 - SPLIT_RATE))][0]]
-        train_loss_vector = network.train_sample(sample=train_sample,
-                                                 label=train_label
-                                                 )
-        valid_loss_vector = network.test_sample(sample=valid_sample,
-                                                label=valid_label
-                                                )
-        train_loss_sum += np.sum(train_loss_vector)
-        valid_loss_sum += np.sum(valid_loss_vector)
+    for epoch in range(EPOCHS):
+        print(f"EPOCH {epoch} ")
+        train_samples, train_labels = split_arr(array=train_data, mb_size=MB_SIZE)
+        valid_samples, valid_labels = split_arr(array=valid_data, mb_size=MB_SIZE)
+        # print("SPLIT DONE")
 
-        # TODO
-        # acc = corect / sum(all) *100%
-        corr_train_index = train_labels[i % int(NUM * SPLIT_RATE)][0]
-        corr_valid_index = valid_labels[i % int(NUM * (1 - SPLIT_RATE))][0]
-        train_accuracy = train_loss_vector[corr_train_index] / np.sum(train_loss_vector) * 100
-        valid_accuracy = valid_loss_vector[corr_valid_index] / np.sum(train_loss_vector) * 100
+        for train_batch_samples, train_batch_labels in zip(train_samples, train_labels):
+            for train_sample, train_label in zip(train_batch_samples, train_batch_labels, ):
+                train_loss_vector = network.train_sample(sample=train_sample[0],
+                                                         label=outs[train_label[0][0]]
+                                                         )
+                train_loss_sum += np.sum(train_loss_vector)
+                train_accuracy += (train_loss_vector[train_label[0][0]] / np.sum(train_loss_vector) * 100)
 
-        network.update_gradients(MB_SIZE, adam=0)
-        train_loss_arr.append(train_loss_sum)
-        valid_loss_arr.append(valid_loss_sum)
+            network.update_gradients(MB_SIZE, adam=0)
+            train_loss_arr.append(train_loss_sum / MB_SIZE)
+            train_accuracy_arr.append(train_accuracy / MB_SIZE)
+            train_loss_sum = 0
+            train_accuracy = 0
 
-        train_accuracy_arr.append(train_accuracy)
-        valid_accuracy_arr.append(valid_accuracy)
 
-        train_loss_sum = 0
-        valid_loss_sum = 0
+        for valid_batch_samples, valid_batch_labels in zip(valid_samples, valid_labels):
+            for valid_sample, valid_label in zip(valid_batch_samples, valid_batch_labels):
+                valid_loss_vector = network.test_sample(sample=valid_sample[0],
+                                                        label=outs[valid_label[0][0]],
+                                                        )
+                valid_loss_sum += np.sum(valid_loss_vector)
+                valid_accuracy += (valid_loss_vector[valid_label[0]] / np.sum(valid_loss_vector) * 100)[0]
+
+            valid_loss_arr.append(valid_loss_sum / MB_SIZE)
+            valid_accuracy_arr.append(valid_accuracy / MB_SIZE)
+            valid_accuracy = 0
+            valid_loss_sum = 0
+
+
+
 
     print('AFTER TRAINING')
+    # <--- Training ENDLoop --->
 
     # print('AFTER TESTING')
-    loss_plot(np.array(train_loss_arr), np.array(valid_loss_arr), np.array(train_accuracy_arr), np.array(valid_accuracy_arr))
+    valid_loss_arr.insert(0, train_loss_arr[0])
+    valid_accuracy_arr.insert(0, train_accuracy_arr[0])
+    draw_plots(np.array(train_loss_arr), np.array(valid_loss_arr),
+               np.array(train_accuracy_arr), np.array(valid_accuracy_arr))
 
     end = time()
 
