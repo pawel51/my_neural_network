@@ -2,6 +2,7 @@ from edge import Edge
 import math as m
 import numpy as np
 
+
 class Node:
 
     def __init__(self, r, k):
@@ -17,11 +18,11 @@ class Node:
         self.mean = 0
         self.variance = 0
         self.loss = 0
+        self.v = 0
 
     def create_inputs(self, prev_layer_node_list):
         for node in prev_layer_node_list:
             self.inputs.append(Edge(node, self))
-
 
     def set_input_weights(self, weights):
         for input, index in zip(self.inputs, range(len(weights))):
@@ -34,8 +35,7 @@ class Node:
             w = input.get_weight()
             sigma += float(x) * w
 
-        self.set_output(activ(sigma+self.bias))
-
+        self.set_output(activ(sigma + self.bias))
 
     def loop_back_inputs(self, act):
         for input in self.inputs:
@@ -53,8 +53,8 @@ class Node:
 
     def start_back(self, l_f, y, act, outputs):
         # dL/dyhat
-        dL_dyhat = l_f(y=y, yhat=self.get_output(), outputs=np.array(outputs), derivative=1)
-        self.loss = l_f(y=y, yhat=self.get_output(), outputs=np.array(outputs), derivative=0)
+        dL_dyhat = l_f(y=y, yhat=self.get_output(), outputs=outputs, derivative=1)
+        self.loss = l_f(y=y, yhat=self.get_output(), outputs=outputs, derivative=0)
         self.error = dL_dyhat
         self.loop_back_inputs(act=act)
 
@@ -67,12 +67,24 @@ class Node:
         for input_ in self.inputs:
             input_.update_gradient(n=n, alfa=alfa)
 
+    def update_gradients_momentum(self, n, alfa):
+        beta = 0.9
+
+        self.bias_grad /= n
+
+        self.v = self.v * beta - alfa * self.bias_grad
+        self.bias += self.v
+        self.bias_grad = 0
+
+        for input in self.inputs:
+            input.update_gradient_momentum(n, alfa)
+
     def update_gradients_adam(self, n, alfa):
         beta1 = 0.9
         beta2 = 0.999
         eps = 0.00000001
 
-        # self.bias_grad /= n
+        self.bias_grad /= n
 
         self.mean = beta1 * self.mean - (1 - beta1) * self.bias_grad
         mean = self.mean / (1 - beta1)
@@ -83,9 +95,7 @@ class Node:
         self.bias -= alfa * (mean / (m.sqrt(variance) + eps))
         self.bias_grad = 0
         for input_ in self.inputs:
-
             input_.update_gradient_adam(n=n, alfa=alfa)
-
 
     def get_loss(self):
         return self.loss
@@ -94,26 +104,20 @@ class Node:
 
         return self.error
 
-
     def set_error(self, error):
         self.error = error
-
 
     def add_error(self, num):
         self.error += num
 
-
     def set_output(self, number):
         self.output = number
-
 
     def get_output(self):
         return self.output
 
-
     def add_to_output(self, num):
         self.output += num
-
 
     def get_inputs(self):
         return self.inputs

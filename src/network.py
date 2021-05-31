@@ -53,11 +53,11 @@ class Network:
             layer.init_weights(weights)
             i_layer += 1
 
-    def update_gradients(self, n, adam=0):
+    def update_gradients(self, n, opt=0):
         # n how many samples in training iteration
         # first layer is input layer so dont update it
         for layer in self.layers[1:]:
-            layer.update_gradients(n, self.alfa, adam=adam)
+            layer.update_gradients(n, self.alfa, opt=opt)
 
     def calc_loss(self):
         # yhat = np.array(self.layers[len(self.layers) - 1].get_outputs())
@@ -71,12 +71,12 @@ class Network:
         self.feed_sample(sample)
         self.layers[len(self.layers)-1].start_back_prop(l_f=self.l_f, y=label, act=self.act_func)
         self.back_prop()
-        return self.calc_loss()
+        return self.calc_loss(), self.layers[len(self.layers)-1].get_outputs()
 
     # <--- Testing starts here --->
     def test_sample(self, sample, label):
         self.feed_sample(sample)
-        return self.calc_loss()
+        return self.calc_loss(), self.layers[len(self.layers)-1].get_outputs()
 
     def feed_sample(self, inputs):
         self.layers[0].add_inputs_from_user(inputs)

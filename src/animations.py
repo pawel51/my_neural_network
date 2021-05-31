@@ -15,13 +15,13 @@ ln_vloss, = ax1.plot([], [])
 ln_accu, = ax2.plot([], [])
 ln_vaccu, = ax2.plot([], [])
 
-ITER = 15
+ITER = 1500
 
 
 def init():
     ax1.set_xlim(0, ITER)
     ax2.set_xlim(0, ITER)
-    ax1.set_ylim(22, 24)
+    ax1.set_ylim(0, 10)
     ax2.set_ylim(0, 1)
     return ln_loss, ln_vloss, ln_accu, ln_vaccu,
 
@@ -57,11 +57,11 @@ def animate():
 
     ani = FuncAnimation(fig, update,
                         fargs=(tl, vl, ta, va),
-                        frames=np.linspace(0, ITER - 1, ITER),
+                        frames=(np.linspace(0, ITER - 1, int((ITER-1)/15))).astype(dtype=int),
                         interval=100,
                         init_func=init,
                         blit=True,
-                        cache_frame_data=False,
+                        cache_frame_data=True,
                         repeat=False)
     plt.show()
 

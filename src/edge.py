@@ -3,23 +3,35 @@ import math as m
 class Edge:
     def __init__(self, start, end):
         self.weight = 0  # before init weights
+        self.temp_weight = 0
         self.start = start  # starting node address
         self.end = end  # ending node address
         self.gradient = 0
         self.mean = 0
         self.variance = 0
+        self.v = 0
 
 
     def update_gradient(self, n, alfa):
         self.weight -= alfa * (self.gradient/n)
         self.gradient = 0
 
+    def update_gradient_momentum(self, n, alfa):
+        beta = 0.9
+
+        self.gradient /= n
+
+        self.v = self.v*beta - alfa * self.gradient
+        self.weight += self.v
+        self.gradient = 0
+
+
     def update_gradient_adam(self, n, alfa):
         beta1 = 0.9
         beta2 = 0.999
         eps = 0.00000001
 
-        # self.gradient /= n
+        self.gradient /= n
 
         self.mean = beta1 * self.mean - (1 - beta1) * self.gradient
         mean = self.mean / (1 - beta1)

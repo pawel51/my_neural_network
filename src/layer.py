@@ -41,13 +41,16 @@ class Layer:
             node.backward(act=act)
             node.set_error(0)
 
-    def update_gradients(self, n, alfa, adam):
-        if not adam:
+    def update_gradients(self, n, alfa, opt):
+        if opt == 0:
             for node in self.node_list:
                 node.update_gradients(n, alfa)
-        if adam:
+        if opt == 1:
             for node in self.node_list:
                 node.update_gradients_adam(n, alfa)
+        if opt == 2:
+            for node in self.node_list:
+                node.update_gradients_momentum(n, alfa)
 
     # returns losses vector
     def get_losses(self):
@@ -60,8 +63,8 @@ class Layer:
     def get_outputs(self):
         a = []
         for node in self.node_list:
-            a.append(round(node.get_output(), 4))
-        return a
+            a.append(node.get_output())
+        return np.array(a)
 
     def to_string(self):
         layer_str = ""

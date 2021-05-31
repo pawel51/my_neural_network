@@ -2,19 +2,30 @@ import math as m
 import numpy as np
 
 
-def CEL_der(y, yhat, outputs):
+def log(yhat, y, outputs, derivative=0):
+    yhat += 0.0000001
+    # yhat = np.exp(yhat) / (np.sum(np.exp(outputs))+0.00000001)
 
-    return np.exp(yhat) / (np.sum(np.exp(outputs))) - 1
-
-
-
-def CEL(y, yhat, outputs, derivative=0):
     if derivative == 1:
-        return CEL_der(y, yhat, outputs)
+        if y == 1:
+            return -1 / (yhat)
+        else:
+            return 1 / (1 - yhat)
+    if y == 1:
+        return -np.log(yhat)
+    else:
+        if yhat > 1:
+            yhat = 0.999
+        return -1 * np.log(1 - yhat)
 
-    return -1 * np.log(np.exp(yhat) / (np.sum(np.exp(outputs))))
+def CEL(yhat, y, outputs, derivative=0):
+    if derivative == 1:
+        return CEL_der(yhat, y, outputs)
+    return -1 * np.log((np.exp(yhat) / np.sum(np.exp(outputs))) + 0.0001)
 
 
+def CEL_der(yhat, y, outputs):
+    return np.exp(yhat) / (np.sum(np.exp(outputs)) - 1)
 # def hinge_der(y, yhat, outputs):
 #     return ????
 #
@@ -37,7 +48,7 @@ def L2_der(y, yhat):
     return 2 * (yhat - y)
 
 
-def L1(y, yhat,outputs, derivative=0):
+def L1(y, yhat, outputs, derivative=0):
     if derivative == 1:
         return L1_der(y, yhat)
     return np.abs(yhat - y)
@@ -56,8 +67,7 @@ def BCE(y, yhat, outputs, derivative=0):
     if derivative == 1:
         return BCE_der(y, yhat)
 
-    return y * m.log(yhat) + (1 - y) * np.log(1 - yhat)
-
+    return y * np.log(float(yhat)) + (1 - y) * np.log(float(1 - yhat))
 
 
 def BCE_der(y, yhat):
@@ -77,6 +87,8 @@ def relu(x, derivative=0):
 
     if x <= 0:
         return 0
+    elif x > 1:
+        return 1
     else:
         return x
 

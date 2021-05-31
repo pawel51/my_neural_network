@@ -42,7 +42,7 @@ def draw_plots(train_loss, valid_loss, train_acc, valid_acc):
     ax2.plot(x2_t, train_acc, label='training')
     ax2.plot(x2_v, valid_acc, label='validation')
     ax2.legend()
-    ax2.set_title('Accuracy function', fontdict=font)
+    ax2.set_title('Accuracy function ', fontdict=font)
     ax2.set_xlabel('Iterations', fontdict=font)
     ax2.set_ylabel('Accuracy', fontdict=font)
 
