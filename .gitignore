@@ -1,5 +1,7 @@
 /images
 /.idea
+/networks
+/plots
 /todo.txt
 # Byte-compiled / optimized / DLL files
 __pycache__/
