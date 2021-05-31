@@ -18,37 +18,39 @@ categories = [
 ]
 
 outs = [
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [100, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 100, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 100, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 100, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 100, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 100, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 100, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 100, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 100, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 100],
 ]
 
 
 # Mini batch size
-MB_SIZE = 3
+MB_SIZE = 1
 # Label size
 LABEL_SIZE = 10
 # Input Size
 IN_SIZE = 784
 # Number of Hidden layers, number of neurons in each
-HID_LAY = (10, 10)
+# HID_LAY = (1, 128)
 # split rate
 SPLIT_RATE = 0.75
 # sample count
-NUM = 60
+NUM = 20
 # How many times through whole training set
-EPOCHS = 2
+EPOCHS = 1
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     start = time()
+    # total steps count
+    iters = NUM*SPLIT_RATE/MB_SIZE*EPOCHS
 
     # <--- DATA --->
     # 20, 100, 1000, 10k, 60k
@@ -56,16 +58,16 @@ if __name__ == '__main__':
     print("DATA LOADED")
 
     network = Network(
-        alfa=0.1,
-        activation_function='sigmoid',
+        alfa=0.01,
+        activation_function='tanh',
         initializer='he',
-        loss_function='L2')
+        loss_function='CEL')
 
     # First Layer
     network.append_layer(IN_SIZE)
 
-    for i in range(1, HID_LAY[0] - 1):
-        network.append_layer(HID_LAY[1])
+    network.append_layer(64)
+
 
     # Last Layer
     network.append_layer(LABEL_SIZE)
@@ -89,21 +91,24 @@ if __name__ == '__main__':
         train_samples, train_labels = split_arr(array=train_data, mb_size=MB_SIZE)
         valid_samples, valid_labels = split_arr(array=valid_data, mb_size=MB_SIZE)
         # print("SPLIT DONE")
-
+        iter = 0
         for train_batch_samples, train_batch_labels in zip(train_samples, train_labels):
             for train_sample, train_label in zip(train_batch_samples, train_batch_labels, ):
                 train_loss_vector = network.train_sample(sample=train_sample[0],
                                                          label=outs[train_label[0][0]]
                                                          )
                 train_loss_sum += np.sum(train_loss_vector)
-                train_accuracy += (train_loss_vector[train_label[0][0]] / np.sum(train_loss_vector) * 100)
+                if train_loss_vector[train_label[0][0]] == np.max(train_loss_vector):
+                    train_accuracy += 1
+
 
             network.update_gradients(MB_SIZE, adam=0)
             train_loss_arr.append(train_loss_sum / MB_SIZE)
             train_accuracy_arr.append(train_accuracy / MB_SIZE)
             train_loss_sum = 0
             train_accuracy = 0
-
+            print(f"     BATCH {iter}")
+            iter += 1
 
         for valid_batch_samples, valid_batch_labels in zip(valid_samples, valid_labels):
             for valid_sample, valid_label in zip(valid_batch_samples, valid_batch_labels):
@@ -111,7 +116,10 @@ if __name__ == '__main__':
                                                         label=outs[valid_label[0][0]],
                                                         )
                 valid_loss_sum += np.sum(valid_loss_vector)
-                valid_accuracy += (valid_loss_vector[valid_label[0]] / np.sum(valid_loss_vector) * 100)[0]
+
+
+                if round(valid_loss_vector[valid_label[0][0]], 8) == round(np.max(valid_loss_vector), 8):
+                    valid_accuracy += 1
 
             valid_loss_arr.append(valid_loss_sum / MB_SIZE)
             valid_accuracy_arr.append(valid_accuracy / MB_SIZE)

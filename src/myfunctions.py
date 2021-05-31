@@ -1,10 +1,33 @@
-import numpy as np
 import math as m
 import numpy as np
 
 
+def CEL_der(y, yhat, outputs):
 
-def L2(y, yhat, derivative=0):
+    return np.exp(yhat) / (np.sum(np.exp(outputs))) - 1
+
+
+
+def CEL(y, yhat, outputs, derivative=0):
+    if derivative == 1:
+        return CEL_der(y, yhat, outputs)
+
+    return -1 * np.log(np.exp(yhat) / (np.sum(np.exp(outputs))))
+
+
+# def hinge_der(y, yhat, outputs):
+#     return ????
+#
+# def hinge(y, yhat, outputs, derivative=0):
+#     if derivative == 1:
+#         return hinge_der(y, yhat, outputs)
+#     maxes = []
+#     for out in outputs:
+#         maximum = np.max(np.append(out - np.max(np.array(outputs) + 1, 0)))
+#         maxes.append(maximum)
+#     return np.sum(np.array(maxes))
+
+def L2(y, yhat, outputs, derivative=0):
     if derivative == 1:
         return L2_der(y, yhat)
     return np.power(yhat - y, 2)
@@ -14,7 +37,7 @@ def L2_der(y, yhat):
     return 2 * (yhat - y)
 
 
-def L1(y, yhat, derivative=0):
+def L1(y, yhat,outputs, derivative=0):
     if derivative == 1:
         return L1_der(y, yhat)
     return np.abs(yhat - y)
@@ -29,7 +52,7 @@ def L1_der(y, yhat):
         return -1
 
 
-def BCE(y, yhat, derivative=0):
+def BCE(y, yhat, outputs, derivative=0):
     if derivative == 1:
         return BCE_der(y, yhat)
 
@@ -85,7 +108,7 @@ def tanh(x, derivative=0):
 
 
 def tanh_der(x):
-    return 1 - m.pow(tanh(x), 2)
+    return 1 - m.pow(m.tanh(x), 2)
 
 
 def he(layers, index):

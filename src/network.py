@@ -1,4 +1,4 @@
-from myfunctions import relu, he, sigmoid, tanh, xavier, L2, L1, BCE
+from myfunctions import relu, he, sigmoid, tanh, xavier, L2, L1, BCE, CEL
 from layer import Layer
 import numpy as np
 
@@ -33,6 +33,9 @@ class Network:
         if loss_function == 'BCE':
             self.l_f = BCE
 
+        if loss_function == 'CEL':
+            self.l_f = CEL
+
     def append_layer(self, neurons_num):
         self.layers.append(Layer(self.layers_len, node_count=neurons_num))
         self.layers_len += 1
@@ -66,7 +69,7 @@ class Network:
     # <--- Training starts here --->
     def train_sample(self, sample, label):
         self.feed_sample(sample)
-        self.start_back_prop(estimator=label)
+        self.layers[len(self.layers)-1].start_back_prop(l_f=self.l_f, y=label, act=self.act_func)
         self.back_prop()
         return self.calc_loss()
 
@@ -80,8 +83,8 @@ class Network:
         for layer in self.layers[1:]:
             layer.feed_layer(self.act_func)
 
-    def start_back_prop(self, estimator):
-        self.layers[len(self.layers)-1].start_back_prop(l_f=self.l_f, y=estimator, act=self.act_func)
+
+
 
 
     def back_prop(self):

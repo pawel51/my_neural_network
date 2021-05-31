@@ -70,7 +70,7 @@ def split_arr(mb_size, array):
 
 
 if __name__ == '__main__':
-    get_data(60)
+    get_data(20000)
     # train_data, valid_data = load_data(split_rate=0.75, num=1000)
     # train_samples, train_labels = split_arr(array=train_data, mb_size=10)
     # valid_data = split_arr(array=valid_data, mb_size=5)

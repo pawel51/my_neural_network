@@ -1,6 +1,6 @@
 from edge import Edge
 import math as m
-
+import numpy as np
 
 class Node:
 
@@ -51,10 +51,10 @@ class Node:
             self.bias_grad += dyhat_dsigma
             prev_node.add_error(self.error * input.get_weight())
 
-    def start_back(self, l_f, y, act):
+    def start_back(self, l_f, y, act, outputs):
         # dL/dyhat
-        dL_dyhat = l_f(y=y, yhat=self.get_output(), derivative=1)
-        self.loss = l_f(y=y, yhat=self.get_output(), derivative=0)
+        dL_dyhat = l_f(y=y, yhat=self.get_output(), outputs=np.array(outputs), derivative=1)
+        self.loss = l_f(y=y, yhat=self.get_output(), outputs=np.array(outputs), derivative=0)
         self.error = dL_dyhat
         self.loop_back_inputs(act=act)
 
@@ -72,7 +72,7 @@ class Node:
         beta2 = 0.999
         eps = 0.00000001
 
-        self.bias_grad /= n
+        # self.bias_grad /= n
 
         self.mean = beta1 * self.mean - (1 - beta1) * self.bias_grad
         mean = self.mean / (1 - beta1)
@@ -83,6 +83,7 @@ class Node:
         self.bias -= alfa * (mean / (m.sqrt(variance) + eps))
         self.bias_grad = 0
         for input_ in self.inputs:
+
             input_.update_gradient_adam(n=n, alfa=alfa)
 
 

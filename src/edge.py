@@ -19,7 +19,7 @@ class Edge:
         beta2 = 0.999
         eps = 0.00000001
 
-        self.gradient /= n
+        # self.gradient /= n
 
         self.mean = beta1 * self.mean - (1 - beta1) * self.gradient
         mean = self.mean / (1 - beta1)

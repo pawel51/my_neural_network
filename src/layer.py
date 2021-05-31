@@ -34,7 +34,7 @@ class Layer:
 
     def start_back_prop(self, l_f, y, act):
         for node, i in zip(self.node_list, range(self.node_count)):
-            node.start_back(l_f=l_f, y=y[i], act=act)
+            node.start_back(l_f=l_f, y=y[i], act=act, outputs=self.get_outputs())
 
     def back_prop(self, act):
         for node in self.node_list:
