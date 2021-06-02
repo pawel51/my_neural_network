@@ -1,13 +1,24 @@
 from node import Node
 from myfunctions import he
 import numpy as np
-
+from myfunctions import relu, sigmoid, tanh, leaky_relu
 
 class Layer:
-    def __init__(self, index, node_count):
+    def __init__(self, index, node_count, activation_function):
         self.index = index
         self.node_count = node_count
         self.node_list = []
+        self.activation = activation_function
+
+        if activation_function == 'relu':
+            self.act_func = relu
+        if activation_function == 'sigmoid':
+            self.act_func = sigmoid
+        if activation_function == 'tanh':
+            self.act_func = tanh
+        if activation_function == 'leaky_relu':
+            self.act_func = leaky_relu
+
         # create all nodes in the layer init: (index of node, index of the layer)
         for i in range(node_count):
             self.node_list.append(Node(i, index))
@@ -28,17 +39,17 @@ class Layer:
         for node, index in zip(self.node_list, range(self.node_count)):
             node.set_input_weights(weights[index])
 
-    def feed_layer(self, activ):
+    def feed_layer(self):
         for node in self.node_list:
-            node.forward(activ)
+            node.forward(self.act_func)
 
-    def start_back_prop(self, l_f, y, act):
+    def start_back_prop(self, l_f, y):
         for node, i in zip(self.node_list, range(self.node_count)):
-            node.start_back(l_f=l_f, y=y[i], act=act, outputs=self.get_outputs())
+            node.start_back(l_f=l_f, y=y[i], act=self.act_func, outputs=self.get_outputs())
 
-    def back_prop(self, act):
+    def back_prop(self):
         for node in self.node_list:
-            node.backward(act=act)
+            node.backward(act=self.act_func)
             node.set_error(0)
 
     def update_gradients(self, n, alfa, opt):

@@ -23,12 +23,12 @@ def load_data(split_rate=0.75, num=20):
     # train_valid_labels = pd.read_csv(f'../images/train/{num}_labels.csv')
     train_valid_samples = pd.read_csv(f'../images/train/{num}_train.csv')
     # 60.000 of images
-    train_valid_samples = np.array(train_valid_samples.iloc[:,1:])
+    train_valid_samples = np.array(train_valid_samples.iloc[:,1:], dtype=np.float64)
     # df = pd.DataFrame(train_images)
     # df.to_csv('../images/train/10_train.csv')
     # 60.000 of acording labels
     # train_valid_labels = np.array(train_valid_labels.iloc[:,1:])
-
+    np.divide(train_valid_samples[:,1:], 255, train_valid_samples[:,1:])
     ts = int(train_valid_samples.shape[0] * split_rate)
 
     train_samples = train_valid_samples[:ts, :]
@@ -66,11 +66,11 @@ def split_arr(mb_size, array):
 
     b_arr = np.array(b_arr)
 
-    return b_arr[:,:,:,1:] / 255, b_arr[:,:,:,0:1]
+    return b_arr[:,:,:,1:], b_arr[:,:,:,0:1].astype(dtype=int)
 
 
 if __name__ == '__main__':
-    get_data(20000)
+    get_data(4096)
     # train_data, valid_data = load_data(split_rate=0.75, num=1000)
     # train_samples, train_labels = split_arr(array=train_data, mb_size=10)
     # valid_data = split_arr(array=valid_data, mb_size=5)
