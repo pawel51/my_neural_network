@@ -1,9 +1,15 @@
-from network import Network
 import json
 import csv
 
 
 def save_network(network, path):
+    try:
+        with open(f'{path}.csv', "r+") as loc:
+            loc.truncate(0)
+        loc.close()
+    except FileNotFoundError:
+        pass
+
     weights, e_vels, e_means, e_vars = [], [], [], []
     n_biases, n_vels, n_means, n_vars = [], [], [], []
     # Global strings
@@ -13,7 +19,8 @@ def save_network(network, path):
            'loss_function': network.loss_function,
            'input_shape': len(network.layers[0].node_list),
            'layers_count': len(network.layers[1:]),
-           'neuron_vector': []
+           'neuron_vector': [],
+           'optimalizer': network.opt
            }
     # EDGE
     # self.mean = 0
@@ -72,21 +79,6 @@ def write_to_file(e_means, e_vars, e_vels, path, weights):
 
 
 if __name__ == '__main__':
-    network = Network(
-        alfa=0.1,
-        activation_function='relu',
-        initializer='he',
-        loss_function='CEL')
 
-    # First Layer
-    network.append_layer(10)
-
-    network.append_layer(128)
-
-    # Last Layer
-    network.append_layer(10)
-
-    network.concat_layers()
-    network.init_weights()
 
     save_network(network, '../networks/net1')

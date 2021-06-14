@@ -1,4 +1,4 @@
-from network import Network
+from logic.network import Network
 import json
 import csv
 
@@ -14,14 +14,14 @@ def load_network(path):
 
     network = Network(
         alfa=atr['alfa'],
-        activation_function=atr['activation'],
         initializer=atr['initializer'],
-        loss_function=atr['loss_function']
+        loss_function=atr['loss_function'],
+        opt=atr['optimalizer']
     )
-
-    network.append_layer(atr['input_shape'])
+    act_func = atr['activations']
+    network.append_layer(atr['input_shape'], act_func[0])
     for i in range(atr['layers_count']):
-        network.append_layer(atr['neuron_vector'][i])
+        network.append_layer(atr['neuron_vector'][i], act_func[i])
     network.concat_layers()
     # print(network.print_network())
     i_row = 0
@@ -58,27 +58,29 @@ def load_network(path):
 
 
 
-def create_new_network(alfa, activation_function, initializer, loss_function, insize, outsize):
+def create_new_network(alfa, activations, initializer, loss_function, neuron_v, optim):
     network = Network(
         alfa=alfa,
-        activation_function=activation_function,
         initializer=initializer,
-        loss_function=loss_function)
+        loss_function=loss_function,
+        opt=optim)
 
     # First Layer
-    network.append_layer(insize)
-    network.append_layer(128)
-    # Last Layer
-    network.append_layer(outsize)
+    j=0
+    network.append_layer(neuron_v[0], '')
+    j+=1
+    for i in range(len(activations)-1):
+        network.append_layer(neuron_v[i+1], activations[i])
+        j+=1
 
     network.concat_layers()
     network.init_weights()
-    print('AFTER NETWORK INIT')
+    print(f'AFTER NETWORK INIT, {j} Layers')
     return network
 
 
 if __name__ == '__main__':
-    load_network('../networks/net1')
+    load_network('../networks/net4')
 
 
 

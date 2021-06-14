@@ -15,14 +15,14 @@ ln_vloss, = ax1.plot([], [])
 ln_accu, = ax2.plot([], [])
 ln_vaccu, = ax2.plot([], [])
 
-ITER = 1500
-
+ITER = 90 #
+DECREASE = 10 # times
 
 def init():
     ax1.set_xlim(0, ITER)
     ax2.set_xlim(0, ITER)
-    ax1.set_ylim(0, 10)
-    ax2.set_ylim(0, 1)
+    ax1.set_ylim(0, 0.3)
+    ax2.set_ylim(0, 0.3)
     return ln_loss, ln_vloss, ln_accu, ln_vaccu,
 
 
@@ -46,10 +46,10 @@ def update(frame, tl, vl, ta, va):
 
 
 def animate():
-    tl = pd.read_csv('../plots/tl.csv')
-    vl = pd.read_csv('../plots/vl.csv')
-    ta = pd.read_csv('../plots/ta.csv')
-    va = pd.read_csv('../plots/va.csv')
+    tl = pd.read_csv('../../plots/tl.csv')
+    vl = pd.read_csv('../../plots/vl.csv')
+    ta = pd.read_csv('../../plots/ta.csv')
+    va = pd.read_csv('../../plots/va.csv')
     tl = np.array(tl.iloc[:, 1:])
     vl = np.array(vl.iloc[:, 1:])
     ta = np.array(ta.iloc[:, 1:])
@@ -57,13 +57,15 @@ def animate():
 
     ani = FuncAnimation(fig, update,
                         fargs=(tl, vl, ta, va),
-                        frames=(np.linspace(0, ITER - 1, int((ITER-1)/15))).astype(dtype=int),
+                        frames=(np.linspace(0, ITER - 1, int((ITER-1)/DECREASE))).astype(dtype=int),
                         interval=100,
                         init_func=init,
                         blit=True,
                         cache_frame_data=True,
                         repeat=False)
     plt.show()
+    ani.save(filename='anim')
+
 
 
 if __name__ == '__main__':

@@ -6,9 +6,9 @@ class Edge:
         self.start = start  # starting node address
         self.end = end  # ending node address
         self.gradient = 0
-        self.mean = 0.1
-        self.variance = 0.1
-        self.v = 10
+        self.mean = 0
+        self.variance = 0
+        self.v = 0
 
 
     def update_gradient(self, n, alfa):

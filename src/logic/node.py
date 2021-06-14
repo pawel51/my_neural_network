@@ -1,7 +1,6 @@
-from edge import Edge
+from logic.edge import Edge
 import math as m
 import numpy as np
-
 
 class Node:
 
@@ -12,16 +11,16 @@ class Node:
         self.inputs = []  # list of input edges
         # output value
         self.output = 0
-        self.bias = 0.5
+        self.bias = 0.01
         self.bias_grad = 0
         self.error = 0
-        self.mean = 0.1
-        self.variance = 0.1
+        self.mean = 0
+        self.variance = 0
         self.loss = 0
-        self.v = 10
-        self.gamma = 1
-        self.beta = 0
-        self.z = 0
+        self.v = 0
+        # self.gamma = 1
+        # self.beta = 0
+        # self.z = 0
 
 
     def create_inputs(self, prev_layer_node_list):
@@ -34,31 +33,31 @@ class Node:
 
     def forward(self, activ):
         sigma = 0
-        in_buf = []
+        # in_buf = []
         for input in self.inputs:
             x = input.get_start().get_output()
             w = input.get_weight()
             sigma += float(x) * w
-            in_buf.append(sigma)
+            # in_buf.append(sigma)
 
         # batch normalisation step
-        inputs_count = len(in_buf)
-        mean = sigma / inputs_count
-        var = 0
-        for part in in_buf:
-            var += part - mean
-        var /= inputs_count
-        sigma = (sigma - mean) / np.sqrt(var**2 + 0.001)
-        self.z = sigma
-        sigma = self.gamma*self.z + self.beta
-        # sigma = (sigma - self.bn_mean) / np.sqrt(self.bn_variance+0.01)
+        # inputs_count = len(in_buf)
+        # mean = (sigma + self.bias) / inputs_count
+        # var = 0
+        # for part in in_buf:
+        #     var += np.power(part - mean, 2)
+        # var /= inputs_count
+        # sigma = (sigma - mean) / np.sqrt(var)
+        # self.z = sigma
+        # sigma = self.gamma*self.z + self.beta
 
         self.set_output(activ(sigma + self.bias))
 
-    def loop_back_inputs(self, act, last_lay):
+    def loop_back_inputs(self, act):
         # dyhat/dsigma
         dyhat_dsigma = self.error * act(self.output, derivative=1)
-
+        self.error = dyhat_dsigma
+        self.bias_grad += dyhat_dsigma
         input_sum = 0
         for input in self.inputs:
             # prev node
@@ -66,29 +65,27 @@ class Node:
             # dsigma/dw
             dsigma_dw = prev_node.get_output()
             # acumulate inputs
-            input_sum += prev_node.get_output()
+            # input_sum += prev_node.get_output()
 
             # dyhat/dw = dyhat/dsigma * dsigma/dw
             dyhat_dw = dyhat_dsigma * dsigma_dw
             input.add_to_gradient(dyhat_dw)
-            self.bias_grad += dyhat_dsigma
             prev_node.add_error(self.error * input.get_weight())
         self.error = 0
-        if last_lay == 0:
-            # dsigma/dbn_mean
-            self.beta = dyhat_dsigma  # * 1
-            # dsigma/dbn_variance
-            self.bn_variance = dyhat_dsigma * self.z
+        # if last_lay == 0:
+        #
+        #     self.beta = dyhat_dsigma  # * 1
+        #
+        #     self.gamma = dyhat_dsigma * self.z
+
 
     def start_back(self, l_f, y, act, outputs):
         # dL/dyhat
         dL_dyhat = l_f(y=y, yhat=self.get_output(), outputs=outputs, derivative=1)
         self.loss = l_f(y=y, yhat=self.get_output(), outputs=outputs, derivative=0)
         self.error = dL_dyhat
-        self.loop_back_inputs(act=act, last_lay=1)
+        self.loop_back_inputs(act=act)
 
-    def backward(self, act):
-        self.loop_back_inputs(act, 0)
 
     def update_gradients(self, n, alfa):
         self.bias -= alfa * (self.bias_grad / n)
@@ -125,6 +122,16 @@ class Node:
         self.bias_grad = 0
         for input_ in self.inputs:
             input_.update_gradient_adam(n=n, alfa=alfa)
+
+
+    def get_weights(self):
+        weights = []
+        weights.append(np.exp(self.output))
+        for input in self.inputs:
+            weights.append(input.get_weight())
+        return weights
+
+
 
     def get_loss(self):
         return self.loss
@@ -167,3 +174,4 @@ class Node:
         node_str += "----------\n"
 
         return node_str
+

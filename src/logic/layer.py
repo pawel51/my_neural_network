@@ -1,7 +1,6 @@
-from node import Node
-from myfunctions import he
+from logic.node import Node
 import numpy as np
-from myfunctions import relu, sigmoid, tanh, leaky_relu
+from logic.myfunctions import relu, sigmoid, tanh, leaky_relu
 
 class Layer:
     def __init__(self, index, node_count, activation_function):
@@ -49,8 +48,9 @@ class Layer:
 
     def back_prop(self):
         for node in self.node_list:
-            node.backward(act=self.act_func)
+            node.loop_back_inputs(act=self.act_func)
             node.set_error(0)
+
 
     def update_gradients(self, n, alfa, opt):
         if opt == 0:
@@ -62,6 +62,13 @@ class Layer:
         if opt == 2:
             for node in self.node_list:
                 node.update_gradients_momentum(n, alfa)
+
+    def get_weights(self):
+        weights = []
+        for node in self.node_list:
+            weights.append(node.get_weights())
+        return weights
+
 
     # returns losses vector
     def get_losses(self):

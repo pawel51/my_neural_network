@@ -2,8 +2,6 @@ import math as m
 import numpy as np
 
 
-
-
 ##
 ##  <-- Losses -->
 ##
@@ -30,7 +28,7 @@ def CE_v2_der(yhat, y, sum):
 
 
 def CE_v2(yhat, y, outputs, derivative=0):
-    sum = np.sum(np.exp(outputs))
+    sum = np.sum(np.exp(outputs)) + 0.00000001
     if derivative == 1:
         return CE_v2_der(yhat, y, sum)
     if y == 1:
@@ -39,10 +37,7 @@ def CE_v2(yhat, y, outputs, derivative=0):
         return -1 * np.log(1 - np.exp(yhat) / sum)
 
 
-
 def CEL(yhat, y, outputs, derivative=0):
-
-
     if derivative == 1:
         return CEL_der(yhat, y, outputs)
     return -1 * np.log((np.exp(yhat) / np.sum(np.exp(outputs))) + 0.0001)
@@ -50,6 +45,8 @@ def CEL(yhat, y, outputs, derivative=0):
 
 def CEL_der(yhat, y, outputs):
     return np.exp(yhat) / np.sum(np.exp(outputs)) - 1
+
+
 # def hinge_der(y, yhat, outputs):
 #     return ????
 #
@@ -90,22 +87,29 @@ def L1_der(y, yhat):
 def BCE(y, yhat, outputs, derivative=0):
     if derivative == 1:
         return BCE_der(y, yhat)
-
-    return y * np.log(float(yhat)) + (1 - y) * np.log(float(1 - yhat))
+    if y == 0:
+        if yhat >= 1:
+            return 21
+        return (1 - y) * np.log(1 - yhat)
+    elif y == 1:
+        if yhat <= 0:
+            return 21
+        return y * np.log(yhat)
 
 
 def BCE_der(y, yhat):
+    if yhat == 0:
+        yhat = 0.00000001
     if yhat == 1:
-        yhat = 0.999999
-    elif yhat == 0:
-        yhat = 0.000001
+        yhat = 1.00000001
     return (yhat - y) / (yhat * (1 - yhat))
-
 
 
 ##
 ##  <-- Activations -->
 ##
+
+
 
 
 def relu(x, derivative=0):
@@ -117,8 +121,8 @@ def relu(x, derivative=0):
 
     if x <= 0:
         return 0
-    # elif x > 10:
-    #     return np.log(x)
+    elif x>=10:
+        return 10
     else:
         return x
 
@@ -129,6 +133,7 @@ def relu_der(x):
     else:
         return 1
 
+
 def leaky_relu(x, derivative=0):
     if derivative == 1:
         if x < 0:
@@ -137,15 +142,11 @@ def leaky_relu(x, derivative=0):
             return 1
 
     if x <= 0:
-        if x < -10:
-            return -10
-        return x*0.01
+        return x * 0.01
     elif x > 10:
         return 10
     else:
         return x
-
-
 
 
 def sigmoid(x, derivative=0):
@@ -178,7 +179,7 @@ def he(layers, index):
         size_l_prev = len(layers[index - 1].get_node_list())
         size_l = len(layers[index].get_node_list())
 
-    return np.random.randn(size_l, size_l_prev) * np.sqrt(1 / size_l_prev)
+    return np.random.randn(size_l, size_l_prev) * np.sqrt(1 / size_l_prev) * 30 - 3
 
 
 def xavier(layers, index):
@@ -188,7 +189,7 @@ def xavier(layers, index):
         size_l_prev = len(layers[index - 1].get_node_list())
         size_l = len(layers[index].get_node_list())
 
-    return np.random.randn(size_l, size_l_prev) * np.sqrt(2 / (size_l_prev + size_l))
+    return np.random.randn(size_l, size_l_prev) * np.sqrt(2 / (size_l_prev + size_l)) * 30 - 3
 
 
 def random(layers, index):
@@ -197,4 +198,4 @@ def random(layers, index):
     else:
         size_l_prev = len(layers[index - 1].get_node_list())
         size_l = len(layers[index].get_node_list())
-        return np.random.rand(size_l, size_l_prev)
+        return (np.random.rand(size_l, size_l_prev) * 6) - 3
