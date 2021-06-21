@@ -199,7 +199,7 @@ class Controller:
                         # print(f'l{i}n{j}e{k} <-- #{a}FF{a}')
                     k += 1
                 j += 1
-            app.update_idletasks()
             i -= 1
+        app.update_idletasks()
         print("I AM RUNNING AND UPDATING COLORS MF")
         app.after(500, self.update_colors, app)

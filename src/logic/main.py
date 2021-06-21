@@ -194,7 +194,7 @@ def debug_run():
             if VISION == 1:
                 with config.WEIGHTS_LOCK:
                     config.WEIGHTS = network.get_weights()
-            time.sleep(0.5)
+            time.sleep(1)
             train_loss_arr.append(train_loss_sum / MB_SIZE)
             train_accuracy_arr.append(train_accuracy / MB_SIZE)
             print(f'train loss: {train_loss_sum / MB_SIZE}')
